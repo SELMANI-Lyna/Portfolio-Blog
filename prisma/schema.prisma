@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProjectCategory {
+  SECURITY
+  BUILD
+}
+
+model User {
+  id           String @id @default(cuid())
+  email        String @unique
+  passwordHash String
+}
+
+model Profile {
+  id          String   @id @default("singleton")
+  name        String
+  tagline     String
+  bio         String
+  resumeUrl   String?
+  socialLinks Json     @default("[]")
+  updatedAt   DateTime @updatedAt
+}
+
+model Education {
+  id           String    @id @default(cuid())
+  institution  String
+  degree       String
+  fieldOfStudy String
+  startDate    DateTime
+  endDate      DateTime?
+  description  String?
+  order        Int       @default(0)
+  createdAt    DateTime  @default(now())
+}
+
+model Project {
+  id          String           @id @default(cuid())
+  title       String
+  description String
+  category    ProjectCategory
+  techTags    String[]
+  stats       Json
+  liveUrl     String?
+  repoUrl     String?
+  coverImage  String?
+  order       Int              @default(0)
+  createdAt   DateTime         @default(now())
+}
+
+model Certificate {
+  id            String   @id @default(cuid())
+  title         String
+  issuer        String
+  dateIssued    DateTime
+  credentialUrl String?
+  fileUrl       String?
+  order         Int      @default(0)
+}
+
+model Internship {
+  id          String    @id @default(cuid())
+  company     String
+  role        String
+  startDate   DateTime
+  endDate     DateTime?
+  description String
+  url         String?
+  order       Int       @default(0)
+}
+
+model SkillGroup {
+  id     String  @id @default(cuid())
+  name   String
+  order  Int     @default(0)
+  skills Skill[]
+}
+
+model Skill {
+  id           String     @id @default(cuid())
+  name         String
+  skillGroupId String
+  skillGroup   SkillGroup @relation(fields: [skillGroupId], references: [id], onDelete: Cascade)
+}
+
+model CurrentlyStatus {
+  id        String   @id @default("singleton")
+  text      String
+  updatedAt DateTime @updatedAt
+}
+
+model ContactInfo {
+  id        String   @id @default("singleton")
+  email     String
+  links     Json
+  updatedAt DateTime @updatedAt
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String
+  body        String
+  images      String[]
+  pdfs        Json     @default("[]")
+  links       Json     @default("[]")
+  likeCount   Int      @default(0)
+  copyCount   Int      @default(0)
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
