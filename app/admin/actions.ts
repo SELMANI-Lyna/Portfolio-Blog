@@ -119,7 +119,6 @@ export async function createProject(formData: FormData) {
   await requireAdmin();
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
-  const category = formData.get("category") as "SECURITY" | "BUILD";
   const techTagsRaw = formData.get("techTags") as string;
   const techTags = techTagsRaw.split(",").map((t) => t.trim()).filter(Boolean);
   const statsRaw = formData.get("stats") as string;
@@ -131,7 +130,7 @@ export async function createProject(formData: FormData) {
   const order = parseInt(formData.get("order") as string || "0", 10);
 
   await prisma.project.create({
-    data: { title, description, category, techTags, stats, liveUrl, repoUrl, coverImage, order },
+    data: { title, description, techTags, stats, liveUrl, repoUrl, coverImage, order },
   });
   revalidatePath("/");
   redirect("/admin/projects");
@@ -142,7 +141,6 @@ export async function updateProject(formData: FormData) {
   const id = formData.get("id") as string;
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
-  const category = formData.get("category") as "SECURITY" | "BUILD";
   const techTagsRaw = formData.get("techTags") as string;
   const techTags = techTagsRaw.split(",").map((t) => t.trim()).filter(Boolean);
   const statsRaw = formData.get("stats") as string;
@@ -155,7 +153,7 @@ export async function updateProject(formData: FormData) {
 
   await prisma.project.update({
     where: { id },
-    data: { title, description, category, techTags, stats, liveUrl, repoUrl, coverImage, order },
+    data: { title, description, techTags, stats, liveUrl, repoUrl, coverImage, order },
   });
   revalidatePath("/");
   redirect("/admin/projects");

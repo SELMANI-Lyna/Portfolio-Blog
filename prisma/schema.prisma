@@ -7,11 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum ProjectCategory {
-  SECURITY
-  BUILD
-}
-
 model User {
   id           String @id @default(cuid())
   email        String @unique
@@ -41,17 +36,16 @@ model Education {
 }
 
 model Project {
-  id          String           @id @default(cuid())
+  id          String   @id @default(cuid())
   title       String
   description String
-  category    ProjectCategory
   techTags    String[]
   stats       Json
   liveUrl     String?
   repoUrl     String?
   coverImage  String?
-  order       Int              @default(0)
-  createdAt   DateTime         @default(now())
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
 }
 
 model Certificate {

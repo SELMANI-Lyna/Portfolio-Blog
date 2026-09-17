@@ -1,18 +1,13 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { cloudinary, cloudinaryConfigured } from "@/lib/cloudinary";
+import { writeFile, mkdir } from "fs/promises";
+import path from "path";
+import crypto from "crypto";
 
 export async function POST(request: Request) {
   const session = await auth();
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  if (!cloudinaryConfigured()) {
-    return NextResponse.json(
-      { error: "Cloudinary is not configured" },
-      { status: 500 },
-    );
   }
 
   const formData = await request.formData();
@@ -21,25 +16,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
   }
 
+  // Generate a unique filename to prevent collisions
+  const ext = path.extname(file.name) || ".png";
+  const uniqueName = `${crypto.randomUUID()}${ext}`;
+
+  const uploadsDir = path.join(process.cwd(), "public", "uploads");
+  await mkdir(uploadsDir, { recursive: true });
+
   const buffer = Buffer.from(await file.arrayBuffer());
+  const filePath = path.join(uploadsDir, uniqueName);
+  await writeFile(filePath, buffer);
 
-  try {
-    const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        { resource_type: "auto", folder: "portfolio" },
-        (error, uploaded) => {
-          if (error || !uploaded?.secure_url) {
-            reject(error ?? new Error("Upload failed"));
-            return;
-          }
-          resolve({ secure_url: uploaded.secure_url });
-        },
-      );
-      stream.end(buffer);
-    });
-
-    return NextResponse.json({ url: result.secure_url });
-  } catch {
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
-  }
+  // Return the public URL path
+  return NextResponse.json({ url: `/uploads/${uniqueName}` });
 }

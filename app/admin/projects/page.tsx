@@ -30,9 +30,7 @@ export default async function ProjectsPage() {
                 <th className="text-left px-4 py-3 font-medium text-gray-700">
                   Title
                 </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-700">
-                  Category
-                </th>
+
                 <th className="text-left px-4 py-3 font-medium text-gray-700">
                   Order
                 </th>
@@ -49,9 +47,7 @@ export default async function ProjectsPage() {
                     {p.title}
                   </td>
 
-                  <td className="px-4 py-3 text-gray-500">
-                    {p.category}
-                  </td>
+
 
                   <td className="px-4 py-3 text-gray-500">
                     {p.order}

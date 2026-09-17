@@ -100,10 +100,10 @@ export default async function Home() {
               </MagneticButton>
               <MagneticButton
                 as="a"
-                href="#work"
+                href="#projects"
                 className="px-6 py-3 rounded-full border border-line bg-white/70 hover:bg-white hover:border-lav-300 transition-colors text-ink font-medium shadow-xs"
               >
-                View Work
+                View Projects
               </MagneticButton>
               {profile?.resumeUrl && (
                 <MagneticButton
@@ -133,7 +133,7 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* 2. Work / Projects */}
+        {/* 2. Projects */}
         <WorkSection projects={projects} />
 
         {/* 3. Certifications (Window-Chrome Carousel) */}
