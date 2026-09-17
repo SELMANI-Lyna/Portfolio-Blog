@@ -217,9 +217,10 @@ export async function createInternship(formData: FormData) {
   const endDate = endDateRaw ? new Date(endDateRaw) : null;
   const description = formData.get("description") as string;
   const url = (formData.get("url") as string) || null;
+  const coverImage = (formData.get("coverImage") as string) || null;
   const order = parseInt(formData.get("order") as string || "0", 10);
 
-  await prisma.internship.create({ data: { company, role, startDate, endDate, description, url, order } });
+  await prisma.internship.create({ data: { company, role, startDate, endDate, description, url, coverImage, order } });
   revalidatePath("/");
   redirect("/admin/internships");
 }
@@ -234,9 +235,10 @@ export async function updateInternship(formData: FormData) {
   const endDate = endDateRaw ? new Date(endDateRaw) : null;
   const description = formData.get("description") as string;
   const url = (formData.get("url") as string) || null;
+  const coverImage = (formData.get("coverImage") as string) || null;
   const order = parseInt(formData.get("order") as string || "0", 10);
 
-  await prisma.internship.update({ where: { id }, data: { company, role, startDate, endDate, description, url, order } });
+  await prisma.internship.update({ where: { id }, data: { company, role, startDate, endDate, description, url, coverImage, order } });
   revalidatePath("/");
   redirect("/admin/internships");
 }

@@ -74,6 +74,8 @@ interface ExperienceTimelineProps {
 }
 
 export function ExperienceSection({ internships }: ExperienceTimelineProps) {
+  if (internships.length === 0) return null;
+
   return (
     <section id="experience" className="w-full relative z-10">
       <div className="max-w-[1100px] px-6 md:px-10 space-y-12">
@@ -83,31 +85,27 @@ export function ExperienceSection({ internships }: ExperienceTimelineProps) {
         </div>
 
         <div className="space-y-2">
-          {internships.length === 0 ? (
-            <p className="text-muted italic">No experience entries added yet.</p>
-          ) : (
-            internships.map((internship) => (
-              <TimelineItem
-                key={internship.id}
-                title={internship.role}
-                subtitle={internship.company}
-                dateRange={`${new Date(internship.startDate).toLocaleDateString("en-US", {
-                  month: "short",
-                  year: "numeric",
-                })} — ${
-                  internship.endDate
-                    ? new Date(internship.endDate).toLocaleDateString("en-US", {
-                        month: "short",
-                        year: "numeric",
-                      })
-                    : "Present"
-                }`}
-                description={internship.description}
-                linkUrl={internship.url}
-                linkLabel="Company site ↗"
-              />
-            ))
-          )}
+          {internships.map((internship) => (
+            <TimelineItem
+              key={internship.id}
+              title={internship.role}
+              subtitle={internship.company}
+              dateRange={`${new Date(internship.startDate).toLocaleDateString("en-US", {
+                month: "short",
+                year: "numeric",
+              })} — ${
+                internship.endDate
+                  ? new Date(internship.endDate).toLocaleDateString("en-US", {
+                      month: "short",
+                      year: "numeric",
+                    })
+                  : "Present"
+              }`}
+              description={internship.description}
+              linkUrl={internship.url}
+              linkLabel="Company site ↗"
+            />
+          ))}
         </div>
       </div>
     </section>
@@ -119,6 +117,8 @@ interface EducationSectionProps {
 }
 
 export function EducationSection({ educationList }: EducationSectionProps) {
+  if (educationList.length === 0) return null;
+
   return (
     <section id="education" className="w-full relative z-10">
       <div className="max-w-[1100px] px-6 md:px-10 space-y-12">
@@ -128,29 +128,25 @@ export function EducationSection({ educationList }: EducationSectionProps) {
         </div>
 
         <div className="space-y-2">
-          {educationList.length === 0 ? (
-            <p className="text-muted italic">No education records added yet.</p>
-          ) : (
-            educationList.map((edu) => (
-              <TimelineItem
-                key={edu.id}
-                title={`${edu.degree} in ${edu.fieldOfStudy}`}
-                subtitle={edu.institution}
-                dateRange={`${new Date(edu.startDate).toLocaleDateString("en-US", {
-                  month: "short",
-                  year: "numeric",
-                })} — ${
-                  edu.endDate
-                    ? new Date(edu.endDate).toLocaleDateString("en-US", {
-                        month: "short",
-                        year: "numeric",
-                      })
-                    : "Present"
-                }`}
-                description={edu.description}
-              />
-            ))
-          )}
+          {educationList.map((edu) => (
+            <TimelineItem
+              key={edu.id}
+              title={`${edu.degree} in ${edu.fieldOfStudy}`}
+              subtitle={edu.institution}
+              dateRange={`${new Date(edu.startDate).toLocaleDateString("en-US", {
+                month: "short",
+                year: "numeric",
+              })} — ${
+                edu.endDate
+                  ? new Date(edu.endDate).toLocaleDateString("en-US", {
+                      month: "short",
+                      year: "numeric",
+                    })
+                  : "Present"
+              }`}
+              description={edu.description}
+            />
+          ))}
         </div>
       </div>
     </section>

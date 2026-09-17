@@ -6,15 +6,14 @@ import { LinkPill } from "./LinkPill";
 import type { Project } from "@prisma/client";
 
 export function WorkSection({ projects }: { projects: Project[] }) {
+  if (projects.length === 0) return null;
+
   return (
     <section id="projects" className="w-full relative z-10">
       <div className="max-w-[1100px] px-6 md:px-10 space-y-12">
         <h3 className="font-display text-3xl font-semibold text-ink">Projects</h3>
 
-        {projects.length === 0 ? (
-          <p className="text-muted italic">No projects yet.</p>
-        ) : (
-          <motion.div
+        <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
@@ -51,7 +50,6 @@ export function WorkSection({ projects }: { projects: Project[] }) {
               </Card>
             ))}
           </motion.div>
-        )}
       </div>
     </section>
   );

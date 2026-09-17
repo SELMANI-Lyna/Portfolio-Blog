@@ -65,14 +65,7 @@ export function SkillsMarquee({ skillGroups }: SkillsMarqueeProps) {
   }, [skillGroups]);
 
   if (allSkills.length === 0) {
-    return (
-      <section id="skills" className="w-full relative z-10">
-        <div className="max-w-[1100px] px-6 md:px-10 space-y-8">
-          <h3 className="font-display text-3xl font-semibold text-ink">Skills</h3>
-          <p className="text-muted italic">No skills added yet.</p>
-        </div>
-      </section>
-    );
+    return null;
   }
 
   const mid = Math.ceil(allSkills.length / 2);

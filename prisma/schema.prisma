@@ -66,6 +66,7 @@ model Internship {
   endDate     DateTime?
   description String
   url         String?
+  coverImage  String?
   order       Int       @default(0)
 }
 
