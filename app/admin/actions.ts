@@ -13,6 +13,8 @@ export async function updateProfile(formData: FormData) {
   const tagline = formData.get("tagline") as string;
   const bio = formData.get("bio") as string;
   const resumeUrl = (formData.get("resumeUrl") as string) || null;
+  const cvMode = (formData.get("cvMode") as string) || "custom";
+  const cvContent = (formData.get("cvContent") as string) || null;
   const socialLinksRaw = formData.get("socialLinks") as string;
   let socialLinks: { platform: string; url: string; label?: string }[] = [];
   try {
@@ -23,8 +25,8 @@ export async function updateProfile(formData: FormData) {
 
   await prisma.profile.upsert({
     where: { id: "singleton" },
-    update: { name, tagline, bio, resumeUrl, socialLinks },
-    create: { id: "singleton", name, tagline, bio, resumeUrl, socialLinks },
+    update: { name, tagline, bio, resumeUrl, cvMode, cvContent, socialLinks },
+    create: { id: "singleton", name, tagline, bio, resumeUrl, cvMode, cvContent, socialLinks },
   });
   revalidatePath("/");
   revalidatePath("/admin/profile");

@@ -14,7 +14,6 @@ export function Navbar({ name = "Lyna Selmani" }: NavbarProps) {
   const navLinks = [
     { label: "About", href: "#intro" },
     { label: "Projects", href: "#projects" },
-    { label: "Certifications", href: "#certificates" },
     { label: "Experience", href: "#experience" },
     { label: "Skills", href: "#skills" },
     { label: "Education", href: "#education" },

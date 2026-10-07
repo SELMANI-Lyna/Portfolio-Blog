@@ -9,18 +9,45 @@ interface SocialLink {
   label?: string;
 }
 
+const DEFAULT_CV_CONTENT = `Profile
+
+Cybersecurity student at ESTIN, focused on infrastructure and IPC security.
+
+Education
+- ESTIN Higher School of Computer Science — Computer Science (Cybersecurity), 2023 — Present
+- Baccalaureate in Mathematics, Boukhlil Brothers School
+
+Projects
+- CommandBase — cybersecurity command & resource manager
+- DZ-Fit — full-stack gym discovery and management platform
+
+Skills
+- Cybersecurity: IPC Security, Network Analysis, Nmap, Wireshark, Burp Suite
+- Languages: Python, TypeScript, JavaScript, C/C++, SQL, Bash
+- Frameworks: FastAPI, Next.js, React, Node.js, PostgreSQL, Prisma
+
+Certifications
+- eJPT — Junior Penetration Tester
+- CompTIA Security+ (SY0-701)
+- Cisco CCNA: Routing & Switching
+- Docker Certified Associate`;
+
 interface ProfileFormProps {
   profile?: {
     name: string;
     tagline: string;
     bio: string;
     resumeUrl: string | null;
+    cvMode?: string | null;
+    cvContent?: string | null;
     socialLinks: any;
   } | null;
 }
 
 export function ProfileForm({ profile }: ProfileFormProps) {
   const [resumeUrl, setResumeUrl] = useState(profile?.resumeUrl || "");
+  const [cvMode, setCvMode] = useState(profile?.cvMode || "custom");
+  const [cvContent, setCvContent] = useState(profile?.cvContent || DEFAULT_CV_CONTENT);
   const [uploading, setUploading] = useState(false);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(() => {
     if (!profile?.socialLinks) return [];
@@ -48,6 +75,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       const data = await res.json();
       if (data.url) {
         setResumeUrl(data.url);
+        setCvMode("pdf");
       } else {
         alert(data.error || "Upload failed");
       }
@@ -107,37 +135,65 @@ export function ProfileForm({ profile }: ProfileFormProps) {
         />
       </div>
 
-      {/* Resume File URL */}
-      <div className="space-y-2 border-t pt-4">
-        <label className="block text-sm font-medium text-gray-700">Resume / CV (Optional)</label>
-        <div className="flex gap-2">
-          <input
-            type="url"
-            name="resumeUrl"
-            value={resumeUrl}
-            onChange={(e) => setResumeUrl(e.target.value)}
-            placeholder="https://... or upload a PDF/doc"
-            className="flex-1 rounded-md border border-gray-300 p-2 text-sm"
-          />
-          <label className="cursor-pointer bg-gray-100 border border-gray-300 hover:bg-gray-200 px-3 py-2 rounded-md text-sm text-gray-700 flex items-center">
-            <span>{uploading ? "Uploading..." : "Upload File"}</span>
-            <input
-              type="file"
-              accept=".pdf,.doc,.docx"
-              onChange={handleFileUpload}
-              disabled={uploading}
-              className="hidden"
-            />
-          </label>
+      <div className="space-y-3 border-t pt-4">
+        <label className="block text-sm font-medium text-gray-700">CV / Resume</label>
+
+        <div className="flex items-center gap-3 rounded-md border border-gray-300 bg-gray-50 p-2">
+          <label className="text-sm font-medium text-gray-700">Mode</label>
+          <select
+            value={cvMode}
+            onChange={(e) => setCvMode(e.target.value)}
+            name="cvMode"
+            className="rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm"
+          >
+            <option value="custom">Use editable CV</option>
+            <option value="pdf">Use uploaded PDF</option>
+          </select>
         </div>
-        {resumeUrl && (
-          <p className="text-xs text-gray-500">
-            Current Resume: <a href={resumeUrl} target="_blank" rel="noreferrer" className="text-indigo-600 underline">Preview file</a>
-          </p>
+
+        {cvMode === "custom" ? (
+          <div className="space-y-2">
+            <textarea
+              name="cvContent"
+              value={cvContent}
+              onChange={(e) => setCvContent(e.target.value)}
+              rows={14}
+              className="w-full rounded-md border border-gray-300 p-3 text-sm"
+              placeholder="Write your CV content here..."
+            />
+            <p className="text-xs text-gray-500">This content will be shown in the CV modal from the hero section.</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <input
+                type="url"
+                name="resumeUrl"
+                value={resumeUrl}
+                onChange={(e) => setResumeUrl(e.target.value)}
+                placeholder="https://... or upload a PDF"
+                className="flex-1 rounded-md border border-gray-300 p-2 text-sm"
+              />
+              <label className="cursor-pointer bg-gray-100 border border-gray-300 hover:bg-gray-200 px-3 py-2 rounded-md text-sm text-gray-700 flex items-center">
+                <span>{uploading ? "Uploading..." : "Upload File"}</span>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={handleFileUpload}
+                  disabled={uploading}
+                  className="hidden"
+                />
+              </label>
+            </div>
+            {resumeUrl && (
+              <p className="text-xs text-gray-500">
+                Current file: <a href={resumeUrl} target="_blank" rel="noreferrer" className="text-indigo-600 underline">Preview PDF</a>
+              </p>
+            )}
+          </div>
         )}
       </div>
 
-      {/* Social Links */}
       <div className="space-y-3 border-t pt-4">
         <div className="flex items-center justify-between">
           <label className="block text-sm font-medium text-gray-700">Social & Profile Links</label>

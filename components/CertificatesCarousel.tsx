@@ -9,59 +9,11 @@ interface CertificatesCarouselProps {
   certificates: Certificate[];
 }
 
-const DEFAULT_CERTIFICATES = [
-  {
-    id: "cert-1",
-    title: "eLearnSecurity Junior Penetration Tester (eJPT)",
-    issuer: "INE Security",
-    dateIssued: new Date("2024-06-15"),
-    credentialUrl: "https://ine.com",
-    fileUrl: null,
-    order: 1,
-  },
-  {
-    id: "cert-2",
-    title: "CompTIA Security+ (SY0-701)",
-    issuer: "CompTIA",
-    dateIssued: new Date("2023-11-20"),
-    credentialUrl: "https://www.comptia.org",
-    fileUrl: null,
-    order: 2,
-  },
-  {
-    id: "cert-3",
-    title: "Cisco CCNA: Switching, Routing & Wireless",
-    issuer: "Cisco Networking Academy",
-    dateIssued: new Date("2023-04-10"),
-    credentialUrl: "https://www.netacad.com",
-    fileUrl: null,
-    order: 3,
-  },
-  {
-    id: "cert-4",
-    title: "Docker Certified Associate & Container Security",
-    issuer: "Mirantis / Docker",
-    dateIssued: new Date("2024-03-05"),
-    credentialUrl: "https://www.docker.com",
-    fileUrl: null,
-    order: 4,
-  },
-  {
-    id: "cert-5",
-    title: "Advanced Computer Systems & Networks Security",
-    issuer: "ESTIN Higher School of Computer Science",
-    dateIssued: new Date("2024-01-18"),
-    credentialUrl: null,
-    fileUrl: null,
-    order: 5,
-  },
-];
-
 export function CertificatesCarousel({ certificates }: CertificatesCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [scrollIndex, setScrollIndex] = useState(0);
 
-  const displayCerts = certificates && certificates.length > 0 ? certificates : DEFAULT_CERTIFICATES;
+  if (!certificates || certificates.length === 0) return null;
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollContainerRef.current) return;
@@ -124,7 +76,7 @@ export function CertificatesCarousel({ certificates }: CertificatesCarouselProps
             className="flex gap-6 overflow-x-auto pb-6 pt-2 scroll-smooth snap-x snap-mandatory no-scrollbar"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {displayCerts.map((cert, idx) => {
+            {certificates.map((cert, idx) => {
               const hash = `0x${((idx + 1) * 374921).toString(16).padStart(6, "0")}...${(idx * 891 + 104).toString(16)}`;
 
               return (
@@ -202,7 +154,7 @@ export function CertificatesCarousel({ certificates }: CertificatesCarouselProps
 
         <div className="flex items-center justify-between pt-1">
           <div className="flex items-center gap-1.5">
-            {displayCerts.map((_, i) => (
+            {certificates.map((_, i) => (
               <div
                 key={i}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
@@ -212,7 +164,7 @@ export function CertificatesCarousel({ certificates }: CertificatesCarouselProps
             ))}
           </div>
           <span className="font-mono text-xs text-[var(--dim)]">
-            {displayCerts.length} Credentials · Scroll horizontally
+            {certificates.length} Credentials · Scroll horizontally
           </span>
         </div>
       </div>

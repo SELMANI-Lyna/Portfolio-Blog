@@ -19,6 +19,8 @@ model Profile {
   tagline     String
   bio         String
   resumeUrl   String?
+  cvMode      String   @default("custom")
+  cvContent   String?
   socialLinks Json     @default("[]")
   updatedAt   DateTime @updatedAt
 }

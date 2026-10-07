@@ -2,7 +2,6 @@ import { prisma } from "@/lib/prisma";
 import { Navbar } from "@/components/Navbar";
 import { HeroSection } from "@/components/HeroSection";
 import { WorkSection } from "@/components/WorkSection";
-import { CertificatesCarousel } from "@/components/CertificatesCarousel";
 import { ExperienceSection, EducationSection } from "@/components/TimelineSection";
 import { SkillsMarquee } from "@/components/SkillsMarquee";
 import { MagneticButton } from "@/components/MagneticButton";
@@ -27,10 +26,6 @@ export default async function Home() {
   });
 
   const projects = await prisma.project.findMany({
-    orderBy: { order: "asc" },
-  });
-
-  const certificates = await prisma.certificate.findMany({
     orderBy: { order: "asc" },
   });
 
@@ -91,10 +86,6 @@ export default async function Home() {
 
         <div className="w-full px-5 sm:px-8 lg:px-14 xl:px-20">
           <WorkSection projects={projects} />
-        </div>
-
-        <div className="w-full px-5 sm:px-8 lg:px-14 xl:px-20">
-          <CertificatesCarousel certificates={certificates} />
         </div>
 
         <div className="w-full px-5 sm:px-8 lg:px-14 xl:px-20">
