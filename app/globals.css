@@ -21,6 +21,9 @@
 }
 
 html {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   scroll-behavior: smooth;
 }
 
@@ -59,10 +62,32 @@ html {
   animation-play-state: paused;
 }
 
+/* Custom scrollbar hiding utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 body {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  overflow-x: hidden;
   background-color: var(--color-bone);
   color: var(--color-ink);
   font-family: var(--font-body);
+  background-image:
+    radial-gradient(rgba(110, 44, 99, 0.04) 1px, transparent 1px),
+    radial-gradient(rgba(169, 150, 214, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 /* Prose styles for blog markdown content */

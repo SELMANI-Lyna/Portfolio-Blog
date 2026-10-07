@@ -1,11 +1,20 @@
+import React from "react";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import ReactMarkdown from "react-markdown";
 import { LikeButton } from "./LikeButton";
 import { CopyButton } from "./CopyButton";
-import ReactMarkdown from "react-markdown";
+import { ReadingProgress } from "@/components/ReadingProgress";
+import { HashtagText } from "@/components/HashtagText";
+import { ScrambleText } from "@/components/ScrambleText";
+import { GridBackdrop } from "@/components/GridBackdrop";
+import { extractTags, readingTime, fmtDate } from "@/lib/blog";
 
 export const dynamic = "force-dynamic";
+
+const withTags = (children: React.ReactNode) =>
+  React.Children.map(children, (c) => (typeof c === "string" ? <HashtagText text={c} /> : c));
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -14,95 +23,98 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   const pdfs = (post.pdfs as { name: string; url: string }[]) || [];
   const links = (post.links as { label: string; url: string }[]) || [];
+  const tags = extractTags(post.description, post.body);
+
+  const row = "th-panel group flex items-center gap-3 rounded-xl px-4 py-3";
 
   return (
-    <div className="w-full min-h-screen bg-bone text-ink">
-      <div className="max-w-3xl mx-auto px-6 py-24 space-y-12">
-        {/* Back + actions */}
-        <div className="flex items-center justify-between">
-          <Link href="/blog" className="font-mono text-sm text-muted hover:text-ink transition-colors">← Blog</Link>
-          <div className="flex items-center gap-3">
-            <LikeButton slug={slug} likeCount={post.likeCount} />
-            <CopyButton slug={slug} />
-          </div>
-        </div>
+    <div className="th-page relative min-h-screen w-full">
+      <ReadingProgress />
+      <GridBackdrop />
 
-        {/* Header */}
-        <div className="space-y-4">
-          <p className="font-mono text-xs text-muted">
-            {new Date(post.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+      <div className="relative mx-auto max-w-3xl space-y-12 px-6 pb-40 pt-24">
+        <Link href="/blog" className="th-dim-link font-mono text-sm">
+          ← Blog
+        </Link>
+
+        <header className="space-y-5">
+          <p className="th-dim font-mono text-xs">
+            {fmtDate(post.createdAt)} · {readingTime(post.body)} min read
           </p>
-          <h1 className="font-display text-5xl font-semibold text-ink leading-tight">{post.title}</h1>
-          <p className="text-xl text-ink/70 leading-relaxed">{post.description}</p>
-        </div>
+          <h1 className="th-fg font-display text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
+            <ScrambleText text={post.title} />
+          </h1>
+          <p className="th-dim text-xl leading-relaxed">{post.description}</p>
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 pt-1">
+              {tags.map((t) => (
+                <Link key={t} href={`/blog?tag=${encodeURIComponent(t)}`} className="th-tag rounded-full px-3 py-1 text-sm">
+                  #{t}
+                </Link>
+              ))}
+            </div>
+          )}
+        </header>
 
-        {/* Cover image */}
         {post.images[0] && (
-          <div className="w-full rounded-2xl overflow-hidden">
-            <img src={post.images[0]} alt={post.title} className="w-full h-auto object-cover" />
+          <div className="th-border overflow-hidden rounded-xl">
+            <img src={post.images[0]} alt={post.title} className="h-auto w-full object-cover" />
           </div>
         )}
 
-        {/* Body */}
-        <article className="prose prose-stone max-w-none">
-          <ReactMarkdown>{post.body}</ReactMarkdown>
+        <article className="th-prose prose max-w-none prose-headings:font-display prose-headings:font-semibold prose-p:leading-relaxed">
+          <ReactMarkdown
+            components={{
+              p: ({ children }) => <p>{withTags(children)}</p>,
+              li: ({ children }) => <li>{withTags(children)}</li>,
+            }}
+          >
+            {post.body}
+          </ReactMarkdown>
         </article>
 
-        {/* Image gallery (remaining images) */}
         {post.images.length > 1 && (
-          <div className="space-y-4">
-            <h2 className="font-display text-2xl font-semibold text-ink">Gallery</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <section className="space-y-4">
+            <h2 className="th-fg font-display text-2xl font-semibold">Gallery</h2>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {post.images.slice(1).map((url, i) => (
-                <div key={i} className="rounded-xl overflow-hidden border border-line">
-                  <img src={url} alt={`Image ${i + 2}`} className="w-full h-48 object-cover" />
+                <div key={i} className="th-border overflow-hidden rounded-xl">
+                  <img src={url} alt={`Image ${i + 2}`} className="h-auto w-full object-cover" />
                 </div>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* PDF downloads */}
         {pdfs.length > 0 && (
-          <div className="space-y-3">
-            <h2 className="font-display text-2xl font-semibold text-ink">Downloads</h2>
-            <div className="space-y-2">
-              {pdfs.map((pdf, i) => (
-                <a key={i} href={pdf.url} download target="_blank" rel="noreferrer"
-                  className="flex items-center gap-3 bg-white border border-line rounded-xl px-4 py-3 hover:border-berry-200 hover:shadow-sm transition-all group">
-                  <span className="text-2xl">📄</span>
-                  <span className="font-medium text-ink group-hover:text-berry-800 transition-colors">{pdf.name}</span>
-                  <span className="ml-auto font-mono text-xs text-muted">Download ↗</span>
-                </a>
-              ))}
-            </div>
-          </div>
+          <section className="space-y-3">
+            <h2 className="th-fg font-display text-2xl font-semibold">Downloads</h2>
+            {pdfs.map((pdf, i) => (
+              <a key={i} href={pdf.url} download target="_blank" rel="noreferrer" className={row}>
+                <span className="th-title font-medium">{pdf.name}</span>
+                <span className="th-dim ml-auto font-mono text-xs">PDF ↗</span>
+              </a>
+            ))}
+          </section>
         )}
 
-        {/* External links */}
         {links.length > 0 && (
-          <div className="space-y-3">
-            <h2 className="font-display text-2xl font-semibold text-ink">Links</h2>
-            <div className="space-y-2">
-              {links.map((link, i) => (
-                <a key={i} href={link.url} target="_blank" rel="noreferrer"
-                  className="flex items-center gap-3 bg-white border border-line rounded-xl px-4 py-3 hover:border-berry-200 hover:shadow-sm transition-all group">
-                  <span className="font-medium text-ink group-hover:text-berry-800 transition-colors">{link.label}</span>
-                  <span className="ml-auto font-mono text-xs text-muted">↗</span>
-                </a>
-              ))}
-            </div>
-          </div>
+          <section className="space-y-3">
+            <h2 className="th-fg font-display text-2xl font-semibold">Links</h2>
+            {links.map((link, i) => (
+              <a key={i} href={link.url} target="_blank" rel="noreferrer" className={row}>
+                <span className="th-title font-medium">{link.label}</span>
+                <span className="th-dim ml-auto font-mono text-xs">↗</span>
+              </a>
+            ))}
+          </section>
         )}
+      </div>
 
-        {/* Bottom actions */}
-        <div className="flex items-center justify-between pt-8 border-t border-line">
-          <Link href="/blog" className="font-mono text-sm text-muted hover:text-ink transition-colors">← Back to Blog</Link>
-          <div className="flex items-center gap-3">
-            <LikeButton slug={slug} likeCount={post.likeCount} />
-            <CopyButton slug={slug} />
-          </div>
-        </div>
+      <div className="th-float fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center gap-1 rounded-full p-1.5 shadow-2xl">
+        <LikeButton slug={slug} likeCount={post.likeCount} />
+        <span className="th-sep h-5 w-px" />
+        <CopyButton slug={slug} />
       </div>
     </div>
   );

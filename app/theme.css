@@ -1,0 +1,68 @@
+/* Theme tokens. Dark is the default, light is opt-in via <html data-theme="light"> */
+:root, [data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #080b12;  --panel: #0d121b;  --code-bg: #0b0f17;
+  --line: rgba(255,255,255,.10);  --line-strong: rgba(255,255,255,.25);
+  --fg: #ffffff;  --fg-2: #d4d9e3;  --dim: #8a94a6;
+  --accent: #5ec8ff;  --accent-hover: #a5e0ff;
+  --accent-soft: rgba(94,200,255,.10);  --accent-line: rgba(94,200,255,.35);
+  --glow: rgba(94,200,255,.13);  --grid: rgba(255,255,255,.035);  --hover-bg: rgba(255,255,255,.06);
+}
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f6fa;  --panel: #ffffff;  --code-bg: #edf0f6;
+  --line: rgba(11,16,32,.12);  --line-strong: rgba(11,16,32,.28);
+  --fg: #0b1020;  --fg-2: #2c3445;  --dim: #667085;
+  --accent: #0369a1;  --accent-hover: #075985;
+  --accent-soft: rgba(3,105,161,.08);  --accent-line: rgba(3,105,161,.35);
+  --glow: rgba(3,105,161,.10);  --grid: rgba(11,16,32,.05);  --hover-bg: rgba(11,16,32,.05);
+}
+
+.th-page { background: var(--bg); color: var(--fg-2); }
+.th-fg { color: var(--fg); }
+.th-dim { color: var(--dim); }
+.th-bar { background: var(--accent); }
+.th-sep { background: var(--line); }
+
+.th-dim-link { color: var(--dim); transition: color .2s; }
+.th-dim-link:hover { color: var(--fg); }
+.th-accent-link { color: var(--accent); transition: color .2s; }
+.th-accent-link:hover { color: var(--accent-hover); }
+
+.th-panel { background: var(--panel); border: 1px solid var(--line); transition: border-color .3s; }
+.th-panel:hover { border-color: var(--accent-line); }
+.th-panel:hover .th-title { color: var(--accent); }
+.th-border { border: 1px solid var(--line); }
+.th-title { color: var(--fg); transition: color .2s; }
+
+.th-chip { border: 1px solid var(--line); color: var(--dim); transition: all .2s; }
+.th-chip:hover { border-color: var(--line-strong); color: var(--fg); }
+.th-chip[data-on="true"] { border-color: var(--accent-line); background: var(--accent-soft); color: var(--accent); }
+
+.th-tag { border: 1px solid var(--accent-line); background: var(--accent-soft); color: var(--accent); transition: color .2s; }
+.th-tag:hover { color: var(--accent-hover); }
+
+.th-btn { color: var(--dim); transition: all .2s; }
+.th-btn:hover { background: var(--hover-bg); color: var(--fg); }
+.th-btn[data-on="true"] { background: var(--accent-soft); color: var(--accent); }
+
+.th-float {
+  background: color-mix(in srgb, var(--panel) 85%, transparent);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.th-prose {
+  --tw-prose-body: var(--fg-2); --tw-prose-headings: var(--fg); --tw-prose-lead: var(--fg-2);
+  --tw-prose-links: var(--accent); --tw-prose-bold: var(--fg); --tw-prose-counters: var(--dim);
+  --tw-prose-bullets: var(--dim); --tw-prose-hr: var(--line); --tw-prose-quotes: var(--fg-2);
+  --tw-prose-quote-borders: var(--accent-line); --tw-prose-captions: var(--dim);
+  --tw-prose-code: var(--accent); --tw-prose-pre-code: var(--fg-2); --tw-prose-pre-bg: var(--code-bg);
+  --tw-prose-th-borders: var(--line); --tw-prose-td-borders: var(--line);
+}
+.th-prose a:hover { color: var(--accent-hover); }
+.th-prose code { background: var(--hover-bg); border-radius: .25rem; padding: .125rem .375rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.th-prose code::before, .th-prose code::after { content: none; }
+.th-prose pre { border: 1px solid var(--line); }
+.th-prose pre code { background: none; padding: 0; }

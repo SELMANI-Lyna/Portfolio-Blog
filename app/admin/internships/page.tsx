@@ -31,8 +31,7 @@ export default async function InternshipsPage() {
                     <Link href={`/admin/internships/${i.id}/edit`} className="text-indigo-600 hover:text-indigo-800 font-medium">Edit</Link>
                     <form action={deleteInternship} className="inline">
                       <input type="hidden" name="id" value={i.id} />
-                      <button type="submit" className="text-red-600 hover:text-red-800 font-medium"
-                        onClick={e => { if (!confirm("Delete?")) e.preventDefault(); }}>Delete</button>
+                      <button type="submit" className="text-red-600 hover:text-red-800 font-medium">Delete</button>
                     </form>
                   </td>
                 </tr>

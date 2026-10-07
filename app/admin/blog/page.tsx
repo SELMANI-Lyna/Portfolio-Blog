@@ -42,8 +42,7 @@ export default async function AdminBlogPage() {
                     <Link href={`/blog/${p.slug}`} target="_blank" className="text-gray-500 hover:text-gray-700 font-medium">View ↗</Link>
                     <form action={deleteBlogPost} className="inline">
                       <input type="hidden" name="id" value={p.id} />
-                      <button type="submit" className="text-red-600 hover:text-red-800 font-medium"
-                        onClick={e => { if (!confirm("Delete this post permanently?")) e.preventDefault(); }}>Delete</button>
+                      <button type="submit" className="text-red-600 hover:text-red-800 font-medium">Delete</button>
                     </form>
                   </td>
                 </tr>

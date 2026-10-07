@@ -8,7 +8,7 @@ interface NavbarProps {
   name?: string;
 }
 
-export function Navbar({ name = "Portfolio" }: NavbarProps) {
+export function Navbar({ name = "Lyna Selmani" }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
@@ -21,56 +21,62 @@ export function Navbar({ name = "Portfolio" }: NavbarProps) {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-bone/85 border-b border-line/50 transition-all">
-      <div className="w-full px-6 md:px-12 py-4 flex items-center justify-end gap-6 md:gap-8">
-        {/* Desktop Nav Links */}
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted">
+    <header className="sticky top-0 z-40 w-full border-b border-[var(--line)] bg-[color:var(--bg)]/80 backdrop-blur-xl">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-6 px-6 py-4 sm:px-10 lg:px-12">
+        <Link
+          href="/"
+          className="group flex items-center gap-2.5 text-[var(--fg)] transition-colors hover:text-[var(--accent)]"
+        >
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--panel)] font-mono text-xs font-bold text-[var(--fg)] shadow-[0_0_0_1px_var(--line)] transition-colors group-hover:bg-[var(--accent-soft)]">
+            LS
+          </div>
+          <span className="font-display text-lg font-semibold tracking-tight">{name}</span>
+          <span className="hidden rounded-full border border-[var(--line)] bg-[var(--panel)] px-2 py-0.5 font-mono text-[11px] text-[var(--dim)] sm:inline-block">
+            4th Year CS @ ESTIN
+          </span>
+        </Link>
+
+        <nav className="hidden items-center gap-6 text-sm font-medium text-[var(--dim)] md:flex">
           {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="hover:text-ink transition-colors"
-            >
+            <a key={link.label} href={link.href} className="transition-colors hover:text-[var(--fg)]">
               {link.label}
             </a>
           ))}
         </nav>
 
-        {/* Right Nav Action Buttons: Blog & Contact */}
         <div className="flex items-center gap-2.5">
           <Link
             href="/blog"
-            className="px-3.5 py-1.5 rounded-full font-medium text-xs sm:text-sm text-ink border border-line bg-white/70 hover:bg-white hover:border-lav-300 hover:text-berry-800 transition-all shadow-xs active:scale-95 flex items-center gap-1"
+            className="flex items-center gap-1.5 rounded-full border border-[var(--line)] bg-[var(--panel)] px-4 py-1.5 text-xs font-medium text-[var(--fg)] transition-all hover:border-[var(--accent-line)] hover:text-[var(--accent)] active:scale-95 sm:text-sm"
           >
-            Blog <span className="text-muted font-normal">→</span>
+            Blog <span className="text-[var(--dim)]">→</span>
           </Link>
+
           <a
             href="#contact"
-            className="px-3.5 py-1.5 rounded-full font-medium text-xs sm:text-sm text-ink border border-line bg-white/70 hover:bg-white hover:border-lav-300 hover:text-berry-800 transition-all shadow-xs active:scale-95"
+            className="rounded-full bg-[var(--accent)] px-4 py-1.5 text-xs font-medium text-white transition-all hover:brightness-110 active:scale-95 sm:text-sm"
           >
             Contact
           </a>
 
-          {/* Mobile hamburger button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-1.5 rounded-lg border border-line bg-white/80 text-ink hover:text-berry-800 transition-colors"
+            className="rounded-xl border border-[var(--line)] bg-[var(--panel)] p-2 text-[var(--fg)] transition-colors hover:text-[var(--accent)] md:hidden"
             aria-label="Toggle navigation menu"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden px-6 py-4 bg-bone/95 border-b border-line space-y-3">
+        <div className="space-y-3 border-b border-[var(--line)] bg-[var(--bg)] px-6 py-4 md:hidden">
           {navLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
               onClick={() => setMobileMenuOpen(false)}
-              className="block text-sm font-medium text-ink hover:text-berry-800 py-1"
+              className="block py-1.5 text-sm font-medium text-[var(--fg)] transition-colors hover:text-[var(--accent)]"
             >
               {link.label}
             </a>

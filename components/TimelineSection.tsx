@@ -23,33 +23,27 @@ export function TimelineItem({
   badge,
 }: TimelineItemProps) {
   return (
-    <div className="group relative pl-8 border-l border-line pb-10 last:pb-2 hover:border-lav-300 transition-colors">
+    <div className="group relative border-l border-[var(--line)] pl-8 pb-10 last:pb-2 transition-colors hover:border-[var(--accent-line)]">
       {/* Timeline Bullet Node */}
-      <div className="absolute w-3.5 h-3.5 bg-bone border-2 border-lav-500 rounded-full -left-[7.5px] top-1.5 group-hover:bg-lav-500 group-hover:scale-125 transition-all shadow-xs" />
+      <div className="absolute -left-[7.5px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-[var(--accent)] bg-[var(--bg)] transition-all group-hover:scale-125 group-hover:bg-[var(--accent)]" />
 
       {/* Card Content with subtle hover lift */}
-      <div className="bg-white/70 hover:bg-white p-5 sm:p-6 rounded-2xl border border-line/80 hover:border-lav-300 hover:shadow-md transition-all duration-300 space-y-3">
+      <div className="space-y-3 rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-5 transition-all duration-300 hover:border-[var(--accent-line)] hover:shadow-[0_12px_24px_rgba(3,105,161,0.06)] sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="font-mono text-xs font-medium text-lav-500 bg-berry-50 px-2.5 py-0.5 rounded-full border border-lav-300/40">
+          <span className="rounded-full border border-[var(--line)] bg-[var(--hover-bg)] px-2.5 py-0.5 font-mono text-xs font-medium text-[var(--accent)]">
             {dateRange}
           </span>
-          {badge && (
-            <span className="font-mono text-xs text-muted">
-              {badge}
-            </span>
-          )}
+          {badge && <span className="font-mono text-xs text-[var(--dim)]">{badge}</span>}
         </div>
 
         <div>
-          <h4 className="font-display text-xl font-semibold text-ink group-hover:text-berry-800 transition-colors">
-            {title} <span className="text-muted font-normal text-base">at</span> {subtitle}
+          <h4 className="font-display text-xl font-semibold text-[var(--fg)] transition-colors group-hover:text-[var(--accent)]">
+            {title} <span className="text-[var(--dim)] font-normal text-base">at</span> {subtitle}
           </h4>
         </div>
 
         {description && (
-          <p className="text-ink/80 leading-relaxed text-sm pt-1 whitespace-pre-line">
-            {description}
-          </p>
+          <p className="whitespace-pre-line pt-1 text-sm leading-relaxed text-[var(--fg-2)]">{description}</p>
         )}
 
         {linkUrl && (
@@ -58,7 +52,7 @@ export function TimelineItem({
               href={linkUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center text-sm font-medium text-berry-600 hover:text-berry-800 underline underline-offset-4"
+              className="inline-flex items-center text-sm font-medium text-[var(--accent)] underline decoration-[var(--accent-line)] underline-offset-4 transition-colors hover:text-[var(--accent-hover)]"
             >
               {linkLabel}
             </a>
@@ -77,11 +71,11 @@ export function ExperienceSection({ internships }: ExperienceTimelineProps) {
   if (internships.length === 0) return null;
 
   return (
-    <section id="experience" className="w-full relative z-10">
-      <div className="max-w-[1100px] px-6 md:px-10 space-y-12">
+    <section id="experience" className="relative z-10 w-full py-6">
+      <div className="mx-auto w-full max-w-7xl space-y-12 px-6 sm:px-10 lg:px-12">
         <div className="space-y-1">
-          <h3 className="font-display text-3xl font-semibold text-ink">Experience</h3>
-          <p className="text-muted text-sm">Professional roles, internships, and security research</p>
+          <h3 className="font-display text-3xl font-semibold text-[var(--fg)]">Experience</h3>
+          <p className="text-sm text-[var(--dim)]">Professional roles, internships, and security research</p>
         </div>
 
         <div className="space-y-2">
@@ -120,11 +114,11 @@ export function EducationSection({ educationList }: EducationSectionProps) {
   if (educationList.length === 0) return null;
 
   return (
-    <section id="education" className="w-full relative z-10">
-      <div className="max-w-[1100px] px-6 md:px-10 space-y-12">
+    <section id="education" className="relative z-10 w-full py-6">
+      <div className="mx-auto w-full max-w-7xl space-y-12 px-6 sm:px-10 lg:px-12">
         <div className="space-y-1">
-          <h3 className="font-display text-3xl font-semibold text-ink">Education</h3>
-          <p className="text-muted text-sm">Academic degrees, coursework, and specialized studies</p>
+          <h3 className="font-display text-3xl font-semibold text-[var(--fg)]">Education</h3>
+          <p className="text-sm text-[var(--dim)]">Academic degrees, coursework, and specialized studies</p>
         </div>
 
         <div className="space-y-2">
