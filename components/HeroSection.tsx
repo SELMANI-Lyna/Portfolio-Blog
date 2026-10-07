@@ -17,12 +17,23 @@ interface HeroSectionProps {
 
 export function HeroSection({ profile, formattedDate }: HeroSectionProps) {
   const [cvModalOpen, setCvModalOpen] = useState(false);
+  const profileData = profile as any;
 
-  const name = profile?.name || "Lyna Selmani";
-  const tagline = profile?.tagline || "4th Year Computer Science Student at ESTIN";
+  const name = profileData?.name || "Lyna Selmani";
+  const tagline = profileData?.tagline || "4th Year Computer Science Student at ESTIN";
   const bio =
-    profile?.bio ||
+    profileData?.bio ||
     "Cybersecurity student at ESTIN, exploring infrastructure and IPC security. Full-stack web developer | mobile app designer.";
+  const cvMode = profileData?.cvMode || "custom";
+
+  const handleCvAction = () => {
+    if (cvMode === "pdf" && profileData?.resumeUrl) {
+      window.open(profileData.resumeUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    setCvModalOpen(true);
+  };
 
   return (
     <section id="intro" className="relative w-full overflow-hidden py-6 md:py-10 lg:min-h-[calc(100svh-92px)] lg:py-0">
@@ -54,11 +65,12 @@ export function HeroSection({ profile, formattedDate }: HeroSectionProps) {
 
             <div className="flex flex-wrap items-center gap-3.5 pt-2">
               <button
-                onClick={() => setCvModalOpen(true)}
+                type="button"
+                onClick={handleCvAction}
                 className="group flex cursor-pointer items-center gap-2 rounded-full bg-[var(--accent)] px-6 py-3 font-medium text-white shadow-[0_10px_22px_rgba(3,105,161,0.18)] transition-all hover:-translate-y-0.5 hover:brightness-110 active:scale-95"
               >
                 <FileText className="h-4 w-4 text-white/90 transition-transform group-hover:scale-110" />
-                <span>See CV</span>
+                <span>Download CV</span>
               </button>
 
               <MagneticButton
@@ -78,7 +90,7 @@ export function HeroSection({ profile, formattedDate }: HeroSectionProps) {
               </MagneticButton>
             </div>
 
-            {profile?.socialLinks && <SocialIcons links={profile.socialLinks} />}
+            {profileData?.socialLinks && <SocialIcons links={profileData.socialLinks} />}
 
             <div className="flex items-center gap-2 pt-2">
               <div className="h-2 w-2 animate-ping rounded-full bg-[var(--accent)]" />
@@ -99,7 +111,9 @@ export function HeroSection({ profile, formattedDate }: HeroSectionProps) {
         onClose={() => setCvModalOpen(false)}
         profileName={name}
         tagline={tagline}
-        resumeUrl={profile?.resumeUrl}
+        resumeUrl={profileData?.resumeUrl}
+        cvMode={cvMode}
+        cvContent={profileData?.cvContent}
       />
     </section>
   );
