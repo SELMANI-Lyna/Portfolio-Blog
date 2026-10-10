@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "Profile"
+    ADD COLUMN IF NOT EXISTS "resumeUrl" TEXT,
+    ADD COLUMN IF NOT EXISTS "cvMode" TEXT NOT NULL DEFAULT 'custom',
+    ADD COLUMN IF NOT EXISTS "cvContent" TEXT,
+    ADD COLUMN IF NOT EXISTS "socialLinks" JSONB NOT NULL DEFAULT '[]';

@@ -13,49 +13,62 @@ import { fmtDate } from "@/lib/blog";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const profile = await prisma.profile.findUnique({
-    where: { id: "singleton" },
-  });
+  let profile: Awaited<ReturnType<typeof prisma.profile.findUnique>> | null = null;
+  let currentlyStatus: Awaited<ReturnType<typeof prisma.currentlyStatus.findUnique>> | null = null;
+  let contactInfo: Awaited<ReturnType<typeof prisma.contactInfo.findUnique>> | null = null;
+  let projects: Awaited<ReturnType<typeof prisma.project.findMany>> = [];
+  let internships: Awaited<ReturnType<typeof prisma.internship.findMany>> = [];
+  let educationList: Awaited<ReturnType<typeof prisma.education.findMany>> = [];
+  let skillGroups: Array<{
+    id: string;
+    name: string;
+    order: number;
+    skills: Array<{
+      id: string;
+      name: string;
+      skillGroupId: string;
+    }>;
+  }> = [];
+  let latestBlogPosts: Array<{
+    id: string;
+    title: string;
+    slug: string;
+    description: string;
+    createdAt: Date;
+    images: string[];
+    likeCount: number;
+  }> = [];
 
-  const currentlyStatus = await prisma.currentlyStatus.findUnique({
-    where: { id: "singleton" },
-  });
-
-  const contactInfo = await prisma.contactInfo.findUnique({
-    where: { id: "singleton" },
-  });
-
-  const projects = await prisma.project.findMany({
-    orderBy: { order: "asc" },
-  });
-
-  const internships = await prisma.internship.findMany({
-    orderBy: { order: "asc" },
-  });
-
-  const educationList = await prisma.education.findMany({
-    orderBy: { order: "asc" },
-  });
-
-  const skillGroups = await prisma.skillGroup.findMany({
-    orderBy: { order: "asc" },
-    include: { skills: true },
-  });
-
-  const latestBlogPosts = await prisma.blogPost.findMany({
-    where: { published: true },
-    orderBy: { createdAt: "desc" },
-    take: 3,
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      description: true,
-      createdAt: true,
-      images: true,
-      likeCount: true,
-    },
-  });
+  try {
+    [profile, currentlyStatus, contactInfo, projects, internships, educationList, skillGroups, latestBlogPosts] = await Promise.all([
+      prisma.profile.findUnique({ where: { id: "singleton" } }),
+      prisma.currentlyStatus.findUnique({ where: { id: "singleton" } }),
+      prisma.contactInfo.findUnique({ where: { id: "singleton" } }),
+      prisma.project.findMany({ orderBy: { order: "asc" } }),
+      prisma.internship.findMany({ orderBy: { order: "asc" } }),
+      prisma.education.findMany({ orderBy: { order: "asc" } }),
+      prisma.skillGroup.findMany({
+        orderBy: { order: "asc" },
+        include: { skills: true },
+      }),
+      prisma.blogPost.findMany({
+        where: { published: true },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          description: true,
+          createdAt: true,
+          images: true,
+          likeCount: true,
+        },
+      }),
+    ]);
+  } catch (error) {
+    console.error("Failed to load portfolio data from the database:", error);
+  }
 
   const dates = [
     profile?.updatedAt,
