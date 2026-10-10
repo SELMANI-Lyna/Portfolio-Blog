@@ -4,24 +4,14 @@ import { LinkPill } from "./LinkPill";
 import { ChevronLeft, ChevronRight, Lock } from "lucide-react";
 import type { Project } from "@prisma/client";
 
-const PROJECT_FALLBACK_IMAGES: Record<string, string> = {
-  "DZ-Fit": "/projects/dz_fit.jpg",
-  "Boutique": "/projects/boutique.jpg",
-  "CommandBase": "/projects/commandbase.jpg",
-};
-
-function getProjectImage(project: Project): string {
-  if (project.coverImage && (project.coverImage.startsWith("/") || project.coverImage.startsWith("http"))) {
-    return project.coverImage;
+function getProjectImage(project: Project): string | null {
+  if (!project.coverImage) return null;
+  const value = project.coverImage.trim();
+  if (!value) return null;
+  if (value.startsWith("/") || value.startsWith("http")) {
+    return value;
   }
-
-  for (const [key, path] of Object.entries(PROJECT_FALLBACK_IMAGES)) {
-    if (project.title.toLowerCase().includes(key.toLowerCase())) {
-      return path;
-    }
-  }
-
-  return "/projects/commandbase.jpg";
+  return null;
 }
 
 export function WorkSection({ projects }: { projects: Project[] }) {
@@ -82,25 +72,38 @@ export function WorkSection({ projects }: { projects: Project[] }) {
                   </span>
                 </div>
 
-                <div className="relative h-56 overflow-hidden border-b border-[var(--line)] bg-[var(--code-bg)] sm:h-64">
-                  <img
-                    src={imageUrl}
-                    alt={project.title}
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      target.src = "/projects/commandbase.jpg";
-                    }}
-                    className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                {imageUrl ? (
+                  <div className="relative h-56 overflow-hidden border-b border-[var(--line)] bg-[var(--code-bg)] sm:h-64">
+                    <img
+                      src={imageUrl}
+                      alt={project.title}
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        target.style.display = "none";
+                      }}
+                      className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-                  <div className="absolute bottom-3 left-4 flex items-center gap-2">
-                    <span className="flex items-center gap-1.5 rounded-md border border-white/15 bg-black/75 px-2.5 py-1 font-mono text-[11px] text-white">
-                      <Lock className="h-3 w-3 text-[var(--accent)]" />
-                      <span>Interactive Preview</span>
-                    </span>
+                    <div className="absolute bottom-3 left-4 flex items-center gap-2">
+                      <span className="flex items-center gap-1.5 rounded-md border border-white/15 bg-black/75 px-2.5 py-1 font-mono text-[11px] text-white">
+                        <Lock className="h-3 w-3 text-[var(--accent)]" />
+                        <span>Interactive Preview</span>
+                      </span>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="flex h-56 items-center justify-center border-b border-[var(--line)] bg-[var(--code-bg)] px-6 text-center sm:h-64">
+                    <div className="space-y-2">
+                      <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--panel)] text-[var(--dim)]">
+                        <Lock className="h-4 w-4" />
+                      </div>
+                      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--dim)]">
+                        Preview Unavailable
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex flex-1 flex-col justify-between space-y-4 p-6">
                   <div className="space-y-2">
