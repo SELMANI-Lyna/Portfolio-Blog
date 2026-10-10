@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { createProject, updateProject } from "../actions";
 
 interface Stat { label: string; value: string; }
@@ -18,6 +18,19 @@ export function ProjectForm({ project }: { project?: Project }) {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string>(project?.coverImage || "");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const hiddenCoverInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const nextValue = project?.coverImage || "";
+    setCoverImage(nextValue);
+    setPreview(nextValue);
+  }, [project?.coverImage]);
+
+  useEffect(() => {
+    if (hiddenCoverInputRef.current) {
+      hiddenCoverInputRef.current.value = coverImage;
+    }
+  }, [coverImage]);
 
   const action = project ? updateProject : createProject;
 
@@ -30,23 +43,26 @@ export function ProjectForm({ project }: { project?: Project }) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Show local preview immediately
     const localUrl = URL.createObjectURL(file);
     setPreview(localUrl);
 
-    // Upload to server
     setUploading(true);
     try {
       const formData = new FormData();
       formData.append("file", file);
       const res = await fetch("/api/upload", { method: "POST", body: formData });
       const data = await res.json();
-      if (data.url) {
-        setCoverImage(data.url);
-        setPreview(data.url);
+      if (!res.ok || !data.url) {
+        throw new Error(data?.error || "Upload failed");
+      }
+
+      const normalizedUrl = String(data.url).trim();
+      setCoverImage(normalizedUrl);
+      setPreview(normalizedUrl);
+      if (hiddenCoverInputRef.current) {
+        hiddenCoverInputRef.current.value = normalizedUrl;
       }
     } catch {
-      // Reset on failure
       setPreview(project?.coverImage || "");
       setCoverImage(project?.coverImage || "");
     } finally {
@@ -57,6 +73,9 @@ export function ProjectForm({ project }: { project?: Project }) {
   const removeCover = () => {
     setCoverImage("");
     setPreview("");
+    if (hiddenCoverInputRef.current) {
+      hiddenCoverInputRef.current.value = "";
+    }
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -64,7 +83,7 @@ export function ProjectForm({ project }: { project?: Project }) {
     <form action={action} className="space-y-4 bg-white p-6 rounded-lg shadow-sm border">
       {project && <input type="hidden" name="id" value={project.id} />}
       <input type="hidden" name="stats" value={JSON.stringify(stats)} />
-      <input type="hidden" name="coverImage" value={coverImage} />
+      <input ref={hiddenCoverInputRef} type="hidden" name="coverImage" value={coverImage} />
 
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2">
