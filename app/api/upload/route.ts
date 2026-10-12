@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 import crypto from "crypto";
+import { cloudinary, cloudinaryConfigured } from "@/lib/cloudinary";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = new Set([
@@ -12,6 +13,52 @@ const ALLOWED_TYPES = new Set([
   "image/gif",
   "image/svg+xml",
 ]);
+
+async function saveToLocal(file: File) {
+  const ext = path.extname(file.name) || ".png";
+  const safeExt = ext.toLowerCase();
+  const uniqueName = `${crypto.randomUUID()}${safeExt}`;
+
+  const uploadsDir = path.join(process.cwd(), "public", "uploads");
+  await mkdir(uploadsDir, { recursive: true });
+
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const filePath = path.join(uploadsDir, uniqueName);
+  await writeFile(filePath, buffer);
+
+  return `/uploads/${uniqueName}`;
+}
+
+async function saveToCloudinary(file: File) {
+  const buffer = Buffer.from(await file.arrayBuffer());
+
+  const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
+    const upload = cloudinary.uploader.upload_stream(
+      {
+        resource_type: "image",
+        folder: "portfolio",
+        transformation: [{ quality: "auto", fetch_format: "auto" }],
+      },
+      (error, uploaded) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        if (!uploaded?.secure_url) {
+          reject(new Error("Cloudinary upload failed"));
+          return;
+        }
+
+        resolve(uploaded);
+      },
+    );
+
+    upload.end(buffer);
+  });
+
+  return result.secure_url;
+}
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -33,16 +80,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Image is too large. Max size is 5MB." }, { status: 400 });
   }
 
-  const ext = path.extname(file.name) || ".png";
-  const safeExt = ext.toLowerCase();
-  const uniqueName = `${crypto.randomUUID()}${safeExt}`;
-
-  const uploadsDir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(uploadsDir, { recursive: true });
-
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const filePath = path.join(uploadsDir, uniqueName);
-  await writeFile(filePath, buffer);
-
-  return NextResponse.json({ url: `/uploads/${uniqueName}` });
+  try {
+    const url = cloudinaryConfigured() ? await saveToCloudinary(file) : await saveToLocal(file);
+    return NextResponse.json({ url });
+  } catch (error) {
+    console.error("Image upload failed", error);
+    return NextResponse.json({ error: "Image upload failed" }, { status: 500 });
+  }
 }

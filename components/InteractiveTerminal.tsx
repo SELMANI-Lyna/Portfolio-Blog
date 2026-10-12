@@ -17,14 +17,16 @@ export function InteractiveTerminal() {
   const [typedText, setTypedText] = useState("");
   const [showOutput, setShowOutput] = useState(false);
   const [cursorVisible, setCursorVisible] = useState(true);
-  const [renderedOutput, setRenderedOutput] = useState<string[]>([]);
+  const [renderedOutputCount, setRenderedOutputCount] = useState(0);
 
-  const timeline = useMemo(() => {
-    return ghostTerminalEntries.flatMap((entry) => [
-      { type: "command", text: `lyna@estin:~$ ${entry.command}` },
-      { type: "output", text: entry.output },
-    ]);
-  }, []);
+  const commandText = useMemo(() => {
+    const entry = ghostTerminalEntries[entryIndex];
+    return entry ? `lyna@estin:~$ ${entry.command}` : "";
+  }, [entryIndex]);
+
+  const prompt = "lyna@estin:~$";
+  const typedCommandText = typedText.startsWith(prompt) ? typedText.slice(prompt.length + 1) : typedText;
+  const remainingCommandText = commandText.startsWith(prompt) ? commandText.slice(prompt.length + 1) : commandText;
 
   useEffect(() => {
     if (prefersReducedMotion) {
@@ -33,7 +35,7 @@ export function InteractiveTerminal() {
         ...entry.output,
       ]);
       setTypedText(allLines.join("\n"));
-      setRenderedOutput(allLines);
+      setRenderedOutputCount(Math.max(...ghostTerminalEntries.map((entry) => entry.output.length)));
       setShowOutput(true);
       return;
     }
@@ -41,16 +43,13 @@ export function InteractiveTerminal() {
     const current = ghostTerminalEntries[entryIndex];
     if (!current) return;
 
-    const commandText = `lyna@estin:~$ ${current.command}`;
     const chars = commandText.split("");
     let charIndex = 0;
     let typingTimer: NodeJS.Timeout | undefined;
-    let outputTimer: NodeJS.Timeout | undefined;
     let outputLineTimer: NodeJS.Timeout | undefined;
-    let resetTimer: NodeJS.Timeout | undefined;
 
     setTypedText("");
-    setRenderedOutput([]);
+    setRenderedOutputCount(0);
     setShowOutput(false);
     setCursorVisible(true);
 
@@ -62,18 +61,17 @@ export function InteractiveTerminal() {
       } else {
         setTimeout(() => {
           setShowOutput(true);
-          const outputLines = current.output;
           let lineIndex = 0;
 
           const renderNextLine = () => {
-            if (lineIndex >= outputLines.length) {
+            if (lineIndex >= current.output.length) {
               setTimeout(() => {
                 setEntryIndex((prev) => (prev + 1) % ghostTerminalEntries.length);
               }, 400);
               return;
             }
 
-            setRenderedOutput(outputLines.slice(0, lineIndex + 1));
+            setRenderedOutputCount(lineIndex + 1);
             lineIndex += 1;
             outputLineTimer = setTimeout(renderNextLine, 90);
           };
@@ -87,11 +85,9 @@ export function InteractiveTerminal() {
 
     return () => {
       clearTimeout(typingTimer);
-      clearTimeout(outputTimer);
       clearTimeout(outputLineTimer);
-      clearTimeout(resetTimer);
     };
-  }, [entryIndex, prefersReducedMotion]);
+  }, [entryIndex, prefersReducedMotion, commandText]);
 
   useEffect(() => {
     if (prefersReducedMotion) return;
@@ -128,9 +124,6 @@ export function InteractiveTerminal() {
       "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.9) 6%, rgba(0,0,0,1) 18%, rgba(0,0,0,1) 82%, rgba(0,0,0,0.9) 94%, transparent 100%), linear-gradient(to bottom, transparent 0%, rgba(0,0,0,1) 8%, rgba(0,0,0,1) 82%, transparent 100%)",
   };
 
-  const currentOutput = showOutput ? renderedOutput : [];
-  const lineCount = currentOutput.length;
-
   return (
     <div
       aria-hidden="true"
@@ -144,27 +137,59 @@ export function InteractiveTerminal() {
     >
       <div className="font-mono text-[clamp(0.75rem,0.9vw,1.05rem)] leading-[1.7] tracking-[-0.02em] text-[var(--fg)] opacity-90">
         {prefersReducedMotion ? (
-          <div className="whitespace-pre-wrap break-words text-[var(--fg)]">
-            {fullText}
-          </div>
+          <div className="whitespace-pre-wrap break-words text-[var(--fg)]">{fullText}</div>
         ) : (
-          <div className="space-y-1 whitespace-pre-wrap break-words">
-            <div className="block text-[var(--fg)] opacity-80">
-              <span className="text-[var(--accent)]">lyna@estin:~$</span>
-              <span className="ml-1 text-[var(--fg)] opacity-80">{typedText}</span>
-              {cursorVisible && typedText.length > 0 && <span className="inline-block h-[1em] w-[0.6ch] translate-y-[0.08em] bg-[var(--fg)] align-middle opacity-75" />}
-              {!typedText && cursorVisible && (
-                <span className="inline-block h-[1em] w-[0.6ch] translate-y-[0.08em] bg-[var(--fg)] align-middle opacity-75" />
-              )}
-            </div>
+          <div className="relative grid w-full">
+            {ghostTerminalEntries.map((entry, entryIdx) => {
+              const currentEntry = entryIdx === entryIndex;
+              const visibleOutputCount = currentEntry ? renderedOutputCount : entry.output.length;
+              const isVisible = currentEntry;
 
-            {showOutput && currentOutput.length > 0 && (
-              <div className="space-y-1 text-[var(--dim)] opacity-55">
-                {currentOutput.map((line, idx) => (
-                  <div key={`${line}-${idx}`}>{line}</div>
-                ))}
-              </div>
-            )}
+              return (
+                <div
+                  key={entry.command}
+                  aria-hidden={!isVisible}
+                  className="col-start-1 row-start-1 transition-opacity duration-200 ease-linear"
+                  style={{ opacity: isVisible ? 1 : 0 }}
+                >
+                  <div className="space-y-1 whitespace-pre-wrap break-words">
+                    <div className="block text-[var(--fg)] opacity-80">
+                      <span className="text-[var(--accent)]">{prompt}</span>
+                      <span className="ml-1 text-[var(--fg)]">
+                        {currentEntry ? (
+                          <>
+                            <span>{typedCommandText}</span>
+                            <span className="opacity-0">{remainingCommandText}</span>
+                          </>
+                        ) : (
+                          <span>{entry.command}</span>
+                        )}
+                      </span>
+
+                      <span
+                        className="ml-[0.12ch] inline-block h-[1em] w-[0.6ch] overflow-hidden align-middle bg-[var(--fg)]"
+                        style={{ opacity: currentEntry && cursorVisible ? 1 : 0 }}
+                      />
+                    </div>
+
+                    <div className="space-y-1 text-[var(--dim)] opacity-55">
+                      {entry.output.map((line, lineIdx) => {
+                        const isRendered = currentEntry ? lineIdx < visibleOutputCount : true;
+                        return (
+                          <div
+                            key={`${entry.command}-${line}-${lineIdx}`}
+                            aria-hidden={!isRendered}
+                            style={{ opacity: isRendered ? 1 : 0 }}
+                          >
+                            {line}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>

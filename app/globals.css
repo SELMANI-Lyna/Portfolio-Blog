@@ -15,9 +15,9 @@
   --color-lav-500: #A996D6;
   --color-grey-400: #B7B4BE;
 
-  --font-display: var(--font-fraunces), serif;
-  --font-body: var(--font-inter), sans-serif;
-  --font-mono: var(--font-jetbrains-mono), monospace;
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --font-body: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "SFMono-Regular", "Consolas", "Liberation Mono", Menlo, monospace;
 }
 
 html {
