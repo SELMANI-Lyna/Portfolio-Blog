@@ -16,6 +16,7 @@ export function ProjectForm({ project }: { project?: Project }) {
   });
   const [coverImage, setCoverImage] = useState<string>(project?.coverImage || "");
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const [preview, setPreview] = useState<string>(project?.coverImage || "");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const hiddenCoverInputRef = useRef<HTMLInputElement>(null);
@@ -24,6 +25,7 @@ export function ProjectForm({ project }: { project?: Project }) {
     const nextValue = project?.coverImage || "";
     setCoverImage(nextValue);
     setPreview(nextValue);
+    setUploadError("");
   }, [project?.coverImage]);
 
   useEffect(() => {
@@ -43,9 +45,7 @@ export function ProjectForm({ project }: { project?: Project }) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const localUrl = URL.createObjectURL(file);
-    setPreview(localUrl);
-
+    setUploadError("");
     setUploading(true);
     try {
       const formData = new FormData();
@@ -62,9 +62,12 @@ export function ProjectForm({ project }: { project?: Project }) {
       if (hiddenCoverInputRef.current) {
         hiddenCoverInputRef.current.value = normalizedUrl;
       }
-    } catch {
-      setPreview(project?.coverImage || "");
-      setCoverImage(project?.coverImage || "");
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : "Upload failed");
+      setPreview(coverImage || project?.coverImage || "");
+      if (hiddenCoverInputRef.current) {
+        hiddenCoverInputRef.current.value = coverImage || project?.coverImage || "";
+      }
     } finally {
       setUploading(false);
     }
@@ -73,6 +76,7 @@ export function ProjectForm({ project }: { project?: Project }) {
   const removeCover = () => {
     setCoverImage("");
     setPreview("");
+    setUploadError("");
     if (hiddenCoverInputRef.current) {
       hiddenCoverInputRef.current.value = "";
     }
@@ -145,6 +149,7 @@ export function ProjectForm({ project }: { project?: Project }) {
                 <span className="text-xs text-indigo-600 animate-pulse">Uploading…</span>
               )}
             </div>
+            {uploadError && <p className="text-xs text-red-600">{uploadError}</p>}
           </div>
         </div>
       </div>
@@ -169,7 +174,7 @@ export function ProjectForm({ project }: { project?: Project }) {
 
       <div className="flex gap-3 pt-2">
         <button type="submit" className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm hover:bg-indigo-700"
-          disabled={uploading}>
+          disabled={uploading || !!uploadError}>
           {project ? "Update" : "Create"} Project
         </button>
         <a href="/admin/projects" className="text-gray-600 hover:text-gray-800 px-4 py-2 text-sm">Cancel</a>

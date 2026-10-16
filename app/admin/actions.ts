@@ -139,7 +139,7 @@ export async function createProject(formData: FormData) {
   const liveUrl = (formData.get("liveUrl") as string) || null;
   const repoUrl = (formData.get("repoUrl") as string) || null;
   const rawCoverImage = (formData.get("coverImage") as string) || "";
-  const coverImage = rawCoverImage && (rawCoverImage.startsWith("/uploads/") || rawCoverImage.startsWith("http")) ? rawCoverImage : null;
+  const coverImage = rawCoverImage.trim() || null;
   const order = parseInt(formData.get("order") as string || "0", 10);
 
   await prisma.project.create({
@@ -162,7 +162,7 @@ export async function updateProject(formData: FormData) {
   const liveUrl = (formData.get("liveUrl") as string) || null;
   const repoUrl = (formData.get("repoUrl") as string) || null;
   const rawCoverImage = (formData.get("coverImage") as string) || "";
-  const coverImage = rawCoverImage && (rawCoverImage.startsWith("/uploads/") || rawCoverImage.startsWith("http")) ? rawCoverImage : null;
+  const coverImage = rawCoverImage.trim() || null;
   const order = parseInt(formData.get("order") as string || "0", 10);
 
   await prisma.project.update({
