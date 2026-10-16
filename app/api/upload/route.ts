@@ -14,6 +14,25 @@ const ALLOWED_TYPES = new Set([
   "image/svg+xml",
 ]);
 
+function getPublicBaseUrl() {
+  const configured = process.env.AUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  return configured.replace(/\/$/, "");
+}
+
+function normalizePublicUrl(url: string) {
+  if (!url) return url;
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+
+  const baseUrl = getPublicBaseUrl();
+  if (url.startsWith("/")) {
+    return `${baseUrl}${url}`;
+  }
+
+  return `${baseUrl}/${url}`;
+}
+
 async function saveToLocal(file: File) {
   const ext = path.extname(file.name) || ".png";
   const safeExt = ext.toLowerCase();
@@ -82,7 +101,7 @@ export async function POST(request: Request) {
 
   try {
     const url = cloudinaryConfigured() ? await saveToCloudinary(file) : await saveToLocal(file);
-    return NextResponse.json({ url });
+    return NextResponse.json({ url: normalizePublicUrl(url) });
   } catch (error) {
     console.error("Image upload failed", error);
     return NextResponse.json({ error: "Image upload failed" }, { status: 500 });
