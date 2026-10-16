@@ -137,8 +137,7 @@ export function WorkSection({ projects }: { projects: Project[] }) {
                 className="group relative w-[85vw] shrink-0 snap-start overflow-visible sm:w-[calc((100%-var(--gap))/2)] min-[1024px]:w-[calc((100%-2*var(--gap))/3)]"
                 style={{
                   minWidth: 0,
-                  // @ts-expect-error CSS variables are valid on React style objects here
-                  ["--gap" as string]: "1.5rem",
+                  ["--gap" as any]: "1.5rem",
                 }}
               >
                 <div className="flex min-h-[420px] w-full flex-col overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--panel)] shadow-[0_12px_35px_rgba(15,23,42,0.05)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--accent-line)]">
