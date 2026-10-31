@@ -19,6 +19,14 @@ export function WorkSection({ projects }: { projects: Project[] }) {
   const scrollRowRef = useRef<HTMLDivElement | null>(null);
   const [canScrollPrev, setCanScrollPrev] = useState(true);
   const [canScrollNext, setCanScrollNext] = useState(false);
+  const [expandedProjects, setExpandedProjects] = useState<Record<string, boolean>>({});
+
+  const toggleProjectDescription = (projectId: string) => {
+    setExpandedProjects((current) => ({
+      ...current,
+      [projectId]: !current[projectId],
+    }));
+  };
 
   const updateScrollState = () => {
     const row = scrollRowRef.current;
@@ -194,9 +202,23 @@ export function WorkSection({ projects }: { projects: Project[] }) {
                       <h4 className="font-display text-xl font-semibold text-[var(--fg)] sm:text-2xl">
                         {project.title}
                       </h4>
-                      <p className="line-clamp-3 text-sm leading-relaxed text-[var(--dim)] sm:line-clamp-4">
-                        {project.description}
-                      </p>
+
+                      <div className="text-sm leading-relaxed text-[var(--dim)]">
+                        <p className={expandedProjects[project.id] ? "block" : "line-clamp-3 sm:line-clamp-4"}>
+                          {project.description}
+                        </p>
+
+                        {project.description && project.description.length > 120 && (
+                          <button
+                            type="button"
+                            onClick={() => toggleProjectDescription(project.id)}
+                            className="mt-2 block w-fit text-left font-medium text-[var(--accent)] transition-opacity hover:opacity-80 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--panel)]"
+                            aria-expanded={!!expandedProjects[project.id]}
+                          >
+                            {expandedProjects[project.id] ? "Read less" : "Read more"}
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     {project.techTags && project.techTags.length > 0 && (

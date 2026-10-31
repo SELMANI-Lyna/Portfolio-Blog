@@ -11,6 +11,7 @@ interface TimelineItemProps {
   linkUrl?: string | null;
   linkLabel?: string;
   badge?: string;
+  imageUrl?: string | null;
 }
 
 export function TimelineItem({
@@ -21,6 +22,7 @@ export function TimelineItem({
   linkUrl,
   linkLabel = "Learn more ↗",
   badge,
+  imageUrl,
 }: TimelineItemProps) {
   return (
     <div className="group relative border-l border-[var(--line)] pl-8 pb-10 last:pb-2 transition-colors hover:border-[var(--accent-line)]">
@@ -29,6 +31,16 @@ export function TimelineItem({
 
       {/* Card Content with subtle hover lift */}
       <div className="space-y-3 rounded-2xl border border-[var(--line)] bg-[var(--panel)] p-5 transition-all duration-300 hover:border-[var(--accent-line)] hover:shadow-[0_12px_24px_rgba(3,105,161,0.06)] sm:p-6">
+        {imageUrl && (
+          <div className="overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--code-bg)]">
+            <img
+              src={imageUrl}
+              alt={`${title} at ${subtitle}`}
+              className="h-48 w-full object-cover sm:h-56"
+            />
+          </div>
+        )}
+
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="rounded-full border border-[var(--line)] bg-[var(--hover-bg)] px-2.5 py-0.5 font-mono text-xs font-medium text-[var(--accent)]">
             {dateRange}
@@ -98,6 +110,7 @@ export function ExperienceSection({ internships }: ExperienceTimelineProps) {
               description={internship.description}
               linkUrl={internship.url}
               linkLabel="Company site ↗"
+              imageUrl={internship.coverImage}
             />
           ))}
         </div>
